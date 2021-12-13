@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import "./tictac.css";
+import Cell from "./Cell";
+import "./Board.css";
 
-export default function Xoad() {
+export default function Board() {
   let grid = [
     ["", "", ""],
     ["", "", ""],
@@ -10,11 +11,15 @@ export default function Xoad() {
   let playerOne = "X";
   let playerTwo = "O";
 
+  let moves = new Set();
+
+  const [counter, setCounter] = useState(0);
   const [state, setState] = useState(grid);
   const [turn, setTurn] = useState(playerOne);
-  const [winner, setWinner] = useState(null);
+  const [stage, setStage] = useState(0);
+  const [winner, setWinner] = useState("null");
 
-  const checkForWinner = (state) => {
+  const checkForWinner = (state: any) => {
     const winningConditions = [
       [state[0][0], state[0][1], state[0][2]],
       [state[1][0], state[1][1], state[1][2]],
@@ -34,33 +39,83 @@ export default function Xoad() {
         setWinner("O");
         return "O";
       }
+      if (condition.every((item) => item === "T")) {
+        setWinner("X");
+        return "X";
+      }
+      if (condition.every((item) => item === "S")) {
+        setWinner("O");
+        return "O";
+      }
     });
+    return false;
   };
 
   const handleTurn = () => {
-    if (turn === playerOne) {
-      setTurn(playerTwo);
+    if (stage == 0) {
+      playerOne = "X";
+      playerTwo = "O";
+      if (turn === playerOne) {
+        setTurn(playerTwo);
+      } else {
+        setTurn(playerOne);
+      }
     } else {
-      setTurn(playerOne);
+      playerOne = "S";
+      playerTwo = "T";
+      if (turn === playerOne) {
+        setTurn(playerTwo);
+      } else {
+        setTurn(playerOne);
+      }
     }
   };
-  
-  const handleSelection = (i, j) => {
+
+  const handleSelection = (i: any, j: any) => {
+    let move = String(i + j);
+    if (move in moves) {
+      return;
+    }
+    moves.add(move);
+
     let prevState = [...state];
     prevState[i][j] = turn;
     let newState = prevState;
     setState(newState);
-    checkForWinner(newState);
+
+    setCounter(counter + 1);
+
+    if (counter == 8) {
+    }
+
+    if (counter == 8 && checkForWinner(newState) == false) {
+      setStage(1);
+      stage == 1 ? setStage(0) : setStage(1);
+      setCounter(0);
+    }
   };
 
   const resetGame = () => {
     setState(grid);
   };
 
+  const logState = () => {
+    console.log("+++++++++++++");
+    console.log(String(state));
+    console.log(counter);
+    console.log(turn);
+    console.log(stage);
+    console.log("+++++++++++++");
+  };
+
+  useEffect(() => {
+    logState();
+  }, [state]);
+
   useEffect(() => {
     console.log(winner);
     if (winner !== null) {
-      alert("winner is " + winner);
+      //alert("winner is " + winner);
       resetGame();
     }
   }, [winner, setWinner]);
@@ -83,7 +138,7 @@ export default function Xoad() {
                       handleSelection(i, j);
                     }}
                   >
-                    {state[i][j]}
+                    <Cell shape={state[i][j]} />
                   </div>
                 );
               })}

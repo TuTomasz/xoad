@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import Xoad from "../components/xoad";
+import Board from "../components/Board";
 
 export default function Game() {
   const [id, setId] = useState(0);
@@ -9,5 +9,5 @@ export default function Game() {
     console.log(id);
   }, [id]);
 
-  return <Xoad />;
+  return <Board />;
 }
